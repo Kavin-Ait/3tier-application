@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  web:
+    build: ./web
+    container_name: veltech_web
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    container_name: veltech_api
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@db:27017
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - db
+    restart: unless-stopped
+    # Uncomment below only if you want api reachable directly from outside for testing.
+    # ports:
+    #   - "4000:4000"
+
+  db:
+    image: mongo:7
+    container_name: veltech_db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/data/db
+    networks:
+      - backend
+    restart: unless-stopped
+    # NOTE: No 'ports:' mapping here on purpose.
+    # This keeps db unreachable from the host and from the public internet entirely.
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true   # extra hardening: this network cannot reach the outside world either
+
+volumes:
+  db_data:
+    driver: local
