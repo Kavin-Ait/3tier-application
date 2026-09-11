@@ -1,4 +1,4 @@
-# VelTech Infrastructure Engineer Take-Home — Kavin
+# VelTech Infrastructure Engineer Taske-Home — Kavin
 
 ## Architecture
 
@@ -26,7 +26,7 @@ This means `db` is unreachable from:
 
 Only `api` can reach `db`, over the internal `backend` network.
 
-### Cloud firewall (defense in depth)
+### Cloud Security Group
 
 On top of the Docker-level isolation above, the EC2 Security Group only opens:
 - Port 80 (HTTP) to `0.0.0.0/0` — for `web`
@@ -45,24 +45,6 @@ independently blocks external access to `db`.
   stack (all 3 services) runs as containers on one host — a custom VPC/private
   subnet/NAT gateway would add complexity without adding real isolation here,
   since isolation is enforced at the Docker network + security group level.
-
-## Trade-offs (due to the 2-hour limit)
-
-- No HTTPS/TLS termination on `web` — plain HTTP only. With more time I'd add
-  Let's Encrypt via Certbot or a reverse proxy like Traefik/Caddy.
-- No automated tests for the `api` endpoints.
-- No CI/CD pipeline — deployment is manual (`docker compose up -d` on the VM).
-- No monitoring/logging aggregation (e.g., no centralized log shipping).
-
-## What I'd do differently with more time
-
-- Add TLS and a proper domain name.
-- Add a CI pipeline to build/push images and redeploy automatically.
-- Add basic monitoring (health checks feeding into something like Prometheus).
-- Add authentication on `api` endpoints.
-- Consider moving `db` to a managed service (e.g., MongoDB Atlas) for
-  production use instead of a self-hosted container.
-
 ## How to run
 
 ```bash
