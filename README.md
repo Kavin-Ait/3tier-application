@@ -35,15 +35,6 @@ On top of the Docker-level isolation above, the EC2 Security Group only opens:
 No other port (including Mongo's `27017`) is opened at the security group level.
 So even if the Docker network isolation were misconfigured, the cloud firewall
 independently blocks external access to `db`.
-
-## Secrets
-
-- Real values (Mongo username/password) live in a local `.env` file, which is
-  listed in `.gitignore` and is never committed.
-- `.env.example` is committed and lists the required variable names with
-  obviously fake placeholder values.
-- `docker-compose.yml` reads secrets via `${VARIABLE}` substitution from `.env`.
-
 ## Assumptions made
 
 - Used MongoDB (brief allowed either Postgres or MongoDB).
@@ -85,4 +76,3 @@ docker network ls
 # verify db persistence
 docker compose down
 docker compose up -d
-```
